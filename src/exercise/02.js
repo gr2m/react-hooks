@@ -5,7 +5,9 @@ import * as React from 'react'
 
 function Greeting({initialName = ''}) {
   const [name, setName] = React.useState(
-    window.localStorage.getItem('name') || initialName,
+    // lazy state initialization, the callback will be called only once
+    // when the component is rendered the firs tiime
+    () => window.localStorage.getItem('name') || initialName,
   )
 
   React.useEffect(() => {
