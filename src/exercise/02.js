@@ -3,16 +3,20 @@
 
 import * as React from 'react'
 
-function Greeting({initialName = ''}) {
-  const [name, setName] = React.useState(
-    // lazy state initialization, the callback will be called only once
-    // when the component is rendered the firs tiime
-    () => window.localStorage.getItem('name') || initialName,
-  )
+function useLocalStorageState(key, initialValue) {
+  const [value, setValue] = React.useState(() => {
+    return window.localStorage.getItem(key) || initialValue
+  })
 
   React.useEffect(() => {
-    window.localStorage.setItem('name', name)
-  })
+    window.localStorage.setItem(key, value)
+  }, [value, key])
+
+  return [value, setValue]
+}
+
+function Greeting({initialName = ''}) {
+  const [name, setName] = useLocalStorageState('name', initialName)
 
   function handleChange(event) {
     setName(event.target.value)
