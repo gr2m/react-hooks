@@ -1,13 +1,17 @@
 // useState: tic tac toe
-// http://localhost:3000/isolated/exercise/04.js
+// http://localhost:3000/isolated/exercise/04.extra-1.js
 
 import * as React from 'react'
+import {useLocalStorageState} from '../utils'
 
 function Board() {
-  const [squares, setSquares] = React.useState(Array(9).fill(null))
-  const [nextValue, setNextValue] = React.useState('X')
-  const [winner, setWinner] = React.useState(null)
-  const [status, setStatus] = React.useState(`Next player: ${nextValue}`)
+  const [squares, setSquares] = useLocalStorageState(
+    'squares',
+    Array(9).fill(null),
+  )
+  const nextValue = calculateNextValue(squares)
+  const winner = calculateWinner(squares)
+  const status = calculateStatus(winner, squares, nextValue)
 
   // 🐨 We'll need the following bits of derived state:
   // - nextValue ('X' or 'O')
@@ -22,8 +26,7 @@ function Board() {
     // 🐨 first, if there's already winner or there's already a value at the
     // given square index (like someone clicked a square that's already been
     // clicked), then return early so we don't make any state changes
-    if (winner) return
-    if (squares[square]) return
+    if (winner || squares[square]) return
 
     // 🦉 It's typically a bad idea to mutate or directly change state in React.
     // Doing so can lead to subtle bugs that can easily slip into production.
@@ -36,28 +39,10 @@ function Board() {
 
     // 🐨 set the squares to your copy
     setSquares(squaresCopy)
-
-    const newWinnerValue = calculateWinner(squaresCopy)
-    const newNextValue = calculateNextValue(squaresCopy)
-    const newStatus = calculateStatus(newWinnerValue, squaresCopy, newNextValue)
-
-    // 🐨 set the winner
-    setWinner(newWinnerValue)
-
-    // 🐨 set the status
-    setStatus(newStatus)
-
-    if (newWinnerValue) return
-
-    // 🐨 set the next value to the opposite of the current value
-    setNextValue(newNextValue)
   }
 
   function restart() {
     setSquares(Array(9).fill(null))
-    setWinner(null)
-    setNextValue('X')
-    setStatus(`Next player: ${nextValue}`)
   }
 
   function renderSquare(i) {
