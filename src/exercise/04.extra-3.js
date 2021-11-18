@@ -4,7 +4,37 @@
 import * as React from 'react'
 import {useLocalStorageState} from '../utils'
 
-function Board() {
+function Board({squares, onSquareSelected}) {
+  function renderSquare(i) {
+    return (
+      <button className="square" onClick={() => onSquareSelected(i)}>
+        {squares[i]}
+      </button>
+    )
+  }
+
+  return (
+    <div>
+      <div className="board-row">
+        {renderSquare(0)}
+        {renderSquare(1)}
+        {renderSquare(2)}
+      </div>
+      <div className="board-row">
+        {renderSquare(3)}
+        {renderSquare(4)}
+        {renderSquare(5)}
+      </div>
+      <div className="board-row">
+        {renderSquare(6)}
+        {renderSquare(7)}
+        {renderSquare(8)}
+      </div>
+    </div>
+  )
+}
+
+function Game() {
   const [squares, setSquares] = useLocalStorageState(
     'squares',
     Array(9).fill(null),
@@ -25,45 +55,14 @@ function Board() {
     setSquares(Array(9).fill(null))
   }
 
-  function renderSquare(i) {
-    return (
-      <button className="square" onClick={() => selectSquare(i)}>
-        {squares[i]}
-      </button>
-    )
-  }
-
-  return (
-    <div>
-      {/* 🐨 put the status in the div below */}
-      <div className="status">{status}</div>
-      <div className="board-row">
-        {renderSquare(0)}
-        {renderSquare(1)}
-        {renderSquare(2)}
-      </div>
-      <div className="board-row">
-        {renderSquare(3)}
-        {renderSquare(4)}
-        {renderSquare(5)}
-      </div>
-      <div className="board-row">
-        {renderSquare(6)}
-        {renderSquare(7)}
-        {renderSquare(8)}
-      </div>
-      <button className="restart" onClick={restart}>
-        restart
-      </button>
-    </div>
-  )
-}
-
-function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board />
+        <div className="status">{status}</div>
+        <Board squares={squares} onSquareSelected={selectSquare} />
+        <button className="restart" onClick={restart}>
+          restart
+        </button>
       </div>
     </div>
   )
