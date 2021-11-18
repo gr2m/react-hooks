@@ -34,35 +34,65 @@ function Board({squares, onSquareSelected}) {
   )
 }
 
-function Game() {
-  const [squares, setSquares] = useLocalStorageState(
-    'squares',
-    Array(9).fill(null),
+function Step({step, currentStep, onSelect}) {
+  const isCurrentStep = step === currentStep
+  const label = step === 0 ? 'Go to game start' : `Go to move #${step}`
+  return (
+    <li key={step}>
+      <button disabled={isCurrentStep} onClick={() => onSelect(step)}>
+        {label} {isCurrentStep ? ' (current)' : ''}
+      </button>
+    </li>
   )
+}
+
+function Game() {
+  const [history, setHistory] = useLocalStorageState('tic-tac-toe:history', [
+    Array(9).fill(null),
+  ])
+  const [currentStep, setCurrentStep] = useLocalStorageState(
+    'tic-tac-toe:step',
+    0,
+  )
+  const squares = history[currentStep]
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
   const status = calculateStatus(winner, squares, nextValue)
+
+  const steps = history.map(
+    (_, step) => new Step({step, currentStep, onSelect: setStep}),
+  )
 
   function selectSquare(square) {
     if (winner || squares[square]) return
 
     const squaresCopy = [...squares]
     squaresCopy[square] = nextValue
-    setSquares(squaresCopy)
+    setCurrentStep(currentStep + 1)
+
+    setHistory([...history.slice(0, currentStep + 1), squaresCopy])
+  }
+
+  function setStep(step) {
+    setCurrentStep(step)
   }
 
   function restart() {
-    setSquares(Array(9).fill(null))
+    setCurrentStep(0)
+    setHistory([Array(9).fill(null)])
   }
 
   return (
     <div className="game">
       <div className="game-board">
-        <div className="status">{status}</div>
         <Board squares={squares} onSquareSelected={selectSquare} />
         <button className="restart" onClick={restart}>
           restart
         </button>
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <ol>{steps}</ol>
       </div>
     </div>
   )
